@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pneumoscan - AI Pulmonary Disease Detection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <!-- PDF Generation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<header>
+    <div class="container">
+        <div class="header-content">
+            <a href="#" class="logo">
+                <i class="fas fa-lungs"></i>
+                Pneumoscan
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="#"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="#"><i class="fas fa-info-circle"></i> About</a></li>
+                    <li><a href="#"><i class="fas fa-chart-bar"></i> Research</a></li>
+                    <li><a href="#"><i class="fas fa-envelope"></i> Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+        <section class="hero">
+            <h1>AI-Powered Pulmonary Disease Detection</h1>
+            <p>Upload a lung X-ray image and get instant analysis using our advanced deep learning model. Pneumoscan helps healthcare professionals detect pneumonia and other pulmonary conditions with high accuracy.</p>
+        </section>
+
+        <!-- Patient Details Form -->
+        <section class="patient-details-section" id="patientDetailsSection">
+            <div class="section-header">
+                <h2><i class="fas fa-user-circle"></i> Patient Information</h2>
+                <p>Please enter patient details before proceeding with X-ray analysis</p>
+            </div>
+
+            <form id="patientDetailsForm" class="patient-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="patientName">Full Name*</label>
+                        <input type="text" id="patientName" required placeholder="Enter patient's full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="patientId">Patient ID (if available)</label>
+                        <input type="text" id="patientId" placeholder="Enter patient ID">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="patientDob">Date of Birth*</label>
+                        <input type="date" id="patientDob" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="patientGender">Gender*</label>
+                        <select id="patientGender" required>
+                            <option value="" disabled selected>Select gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                            <option value="Prefer not to say">Prefer not to say</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="patientEmail">Email</label>
+                        <input type="email" id="patientEmail" placeholder="Enter email address">
+                    </div>
+                    <div class="form-group">
+                        <label for="patientPhone">Phone Number</label>
+                        <input type="tel" id="patientPhone" placeholder="Enter phone number">
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="patientNotes">Clinical Notes (symptoms, medical history)</label>
+                    <textarea id="patientNotes" rows="3" placeholder="Enter any relevant clinical information"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn" id="submitPatientDetails">
+                        <i class="fas fa-check-circle"></i> Submit and Continue to X-ray Upload
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- X-ray Upload Section (Initially Locked) -->
+        <section class="upload-section" id="uploadSection" style="display: none;">
+            <div class="section-header">
+                <h2><i class="fas fa-x-ray"></i> X-ray Upload</h2>
+                <p>Upload a chest X-ray image for AI analysis</p>
+                <div class="patient-info-summary" id="patientSummary">
+                    <!-- Patient summary will be displayed here -->
+                </div>
+                <button class="btn btn-small btn-secondary" onclick="editPatientDetails()">
+                    <i class="fas fa-edit"></i> Edit Patient Details
+                </button>
+            </div>
+
+            <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <div class="drop-zone-text">Drag & Drop X-ray Image</div>
+                <div class="drop-zone-hint">or click to browse files (JPEG, PNG)</div>
+            </div>
+            <img id="previewImage" class="preview-image" alt="X-ray preview">
+            <input type="file" id="fileInput" accept="image/*" hidden>
+            <button class="btn btn-analyze" onclick="analyzeXray()">
+                <i class="fas fa-microscope"></i> Analyze X-ray
+            </button>
+
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p>Analyzing your X-ray image...</p>
+                <p>This may take a few moments</p>
+            </div>
+
+            <div class="result-box" id="resultBox">
+                <div class="result-title">Analysis Results</div>
+                <div class="result-content" id="analysisResult"></div>
+                <div class="result-actions">
+                    <button class="btn btn-secondary" onclick="downloadResult()">
+                        <i class="fas fa-download"></i> Download Report
+                    </button>
+                    <button class="btn" onclick="shareResult()">
+                        <i class="fas fa-share-alt"></i> Share Results
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="copyright">© 2023 Pneumoscan. All rights reserved.</div>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Support</a>
+                <a href="#">Research</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
